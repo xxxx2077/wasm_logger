@@ -20,16 +20,23 @@ def get_pid(program_name):
         return 0
     return int(pid)
 
-def extract_python_template(template):
-    start = len(template.split("[")[0])
-    location = "[" + template.split("[")[1]
-    print("python", start, location)
-    return start, location
+# def extract_golang_template(template):
+#     start = len(template.split("/")[0]) + 2
+#     location = template.split("/")[1].split(",")[0]
+#     print("golang", start, location)
+#     return start, location
 
-def extract_golang_template(template):
-    start = len(template.split("/")[0]) + 2
-    location = template.split("/")[1].split(",")[0]
-    print("golang", start, location)
+def extract_rust_template(template):
+    # 按照 `[` 和 `]` 分割日志字符串
+    parts = log.split('[')
+    # 时间戳部分
+    timestamp_part = parts[1].split(']')[0]
+    # 日志级别部分
+    location = parts[2].split(']')[0]
+    # 计算 start
+    start = len(timestamp_part) + 2
+    # 打印提取的信息
+    print(f"log, {start}, {location}")
     return start, location
 
 parser = argparse.ArgumentParser(
@@ -46,10 +53,7 @@ args = parser.parse_args()
 
 pid = get_pid(args.program)
 
-if args.language == "python":
-    start, location = extract_python_template(args.template)
-elif args.language == "golang":
-    start, location = extract_golang_template(args.template)
+start, location = extract_rust_template(args.template)
 
 class WritePackage(ct.Structure):
     _fields_ = [
